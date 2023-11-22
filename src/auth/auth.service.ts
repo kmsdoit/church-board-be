@@ -4,10 +4,14 @@ import {User} from "../user/entity/user.entity";
 import  {SignUpDto} from "./dto/sign-up.dto";
 import {SignInDto} from "./dto/sign-in.dto";
 import * as bcrypt from 'bcrypt';
+import {JwtService} from "@nestjs/jwt";
 
 @Injectable()
 export class AuthService {
-    constructor(private userService : UserService) {
+    constructor(
+        private userService : UserService,
+        private jwtService : JwtService
+    ) {
     }
 
 
@@ -31,6 +35,10 @@ export class AuthService {
             throw  new UnauthorizedException('비밀번호를 확인해주세요');
         }
 
-        return user
+        const payload = { email, sub : user.role}
+
+        return {
+            access_token : this.jwtService.sign(payload)
+        }
     }
 }
